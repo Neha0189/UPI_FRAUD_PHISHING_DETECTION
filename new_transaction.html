@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}New Transaction{% endblock %}
+{% block content %}
+<h3 class="mb-4">Simulate a New Transaction</h3>
+
+<div class="card p-4 mb-4">
+  <form method="POST">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Sender</label>
+        <select name="sender_id" class="form-select" required>
+          {% for u in users %}
+          <option value="{{ u.user_id }}">{{ u.name }} ({{ u.upi_id }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Receiver</label>
+        <select name="receiver_id" class="form-select" required>
+          {% for u in users %}
+          <option value="{{ u.user_id }}">{{ u.name }} ({{ u.upi_id }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Amount (₹)</label>
+        <input type="number" step="0.01" name="amount" class="form-control" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Device ID</label>
+        <input type="text" name="device_id" class="form-control" placeholder="e.g. DEV1234" required>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Location</label>
+        <input type="text" name="location" class="form-control" placeholder="e.g. Mumbai" required>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-4">Submit Transaction</button>
+  </form>
+</div>
+
+{% if result %}
+<div class="card p-4">
+  <h5>Result for Transaction #{{ result.txn_id }}</h5>
+  <p>
+    Risk Score: <strong>{{ result.score }}</strong> &nbsp;
+    {% if result.level == 'High' %}<span class="risk-high">High Risk</span>
+    {% elif result.level == 'Medium' %}<span class="risk-medium">Medium Risk</span>
+    {% else %}<span class="risk-low">Low Risk</span>{% endif %}
+  </p>
+  {% if result.reasons %}
+  <p>Reasons:</p>
+  <ul>
+    {% for r in result.reasons %}<li>{{ r }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="text-muted">No suspicious patterns detected.</p>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

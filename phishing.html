@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Phishing URL Checker{% endblock %}
+{% block content %}
+<h3 class="mb-4">🔗 Phishing URL Checker</h3>
+
+<div class="card p-4 mb-4">
+  <form method="POST">
+    <label class="form-label">Enter a URL to check</label>
+    <div class="input-group">
+      <input type="text" name="url" class="form-control" placeholder="e.g. http://secure-bank-login.verify.xyz" required>
+      <button type="submit" class="btn btn-primary">Check</button>
+    </div>
+  </form>
+</div>
+
+{% if result %}
+<div class="card p-4 mb-4">
+  <h5>Result for: {{ result.url }}</h5>
+  <p>
+    Risk Score: <strong>{{ result.score }}</strong> &nbsp;
+    {% if result.level == 'Likely Phishing' %}<span class="risk-high">{{ result.level }}</span>
+    {% elif result.level == 'Suspicious' %}<span class="risk-medium">{{ result.level }}</span>
+    {% else %}<span class="risk-low">{{ result.level }}</span>{% endif %}
+  </p>
+  {% if result.reasons %}
+  <p>Reasons:</p>
+  <ul>
+    {% for r in result.reasons %}<li>{{ r }}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="text-muted">No suspicious patterns detected.</p>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="card p-3">
+  <h5>Recent Checks</h5>
+  <table class="table table-hover mt-2">
+    <thead>
+      <tr><th>URL</th><th>Score</th><th>Result</th><th>Checked At</th></tr>
+    </thead>
+    <tbody>
+      {% for h in history %}
+      <tr>
+        <td>{{ h.url }}</td>
+        <td>{{ h.risk_score }}</td>
+        <td>
+          {% if h.risk_level == 'Likely Phishing' %}<span class="risk-high">{{ h.risk_level }}</span>
+          {% elif h.risk_level == 'Suspicious' %}<span class="risk-medium">{{ h.risk_level }}</span>
+          {% else %}<span class="risk-low">{{ h.risk_level }}</span>{% endif %}
+        </td>
+        <td>{{ h.checked_date }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-muted">No URLs checked yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

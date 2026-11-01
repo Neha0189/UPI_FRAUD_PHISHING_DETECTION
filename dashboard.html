@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h3 class="mb-4">Dashboard</h3>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card stat-card"><div class="stat-number">{{ total_txns }}</div><div>Total Transactions</div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card"><div class="stat-number text-danger">{{ high_risk }}</div><div>High Risk</div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card"><div class="stat-number text-warning">{{ medium_risk }}</div><div>Medium Risk</div></div>
+  </div>
+  <div class="col-md-3">
+    <div class="card stat-card"><div class="stat-number">{{ total_users }}</div><div>Registered Users</div></div>
+  </div>
+</div>
+
+<div class="card p-3 mb-4">
+  <h5>Total Volume Processed: ₹{{ "%.2f"|format(total_amount) }}</h5>
+  <a href="{{ url_for('rescan') }}" class="btn btn-sm btn-outline-secondary mt-2">🔄 Re-run Fraud Scan on All Transactions</a>
+</div>
+
+<div class="card p-3">
+  <h5>Recent Transactions</h5>
+  <table class="table table-hover mt-2">
+    <thead>
+      <tr><th>ID</th><th>Sender</th><th>Receiver</th><th>Amount</th><th>Time</th><th>Risk</th></tr>
+    </thead>
+    <tbody>
+      {% for t in recent %}
+      <tr>
+        <td>{{ t.txn_id }}</td>
+        <td>{{ t.sender }}</td>
+        <td>{{ t.receiver }}</td>
+        <td>₹{{ "%.2f"|format(t.amount) }}</td>
+        <td>{{ t.timestamp }}</td>
+        <td>
+          {% if t.risk_level == 'High' %}<span class="risk-high">High ({{ t.risk_score }})</span>
+          {% elif t.risk_level == 'Medium' %}<span class="risk-medium">Medium ({{ t.risk_score }})</span>
+          {% else %}<span class="risk-low">Low ({{ t.risk_score }})</span>{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
