@@ -9,9 +9,21 @@ from flask import Flask, render_template, request, redirect, url_for, send_file
 
 from database import get_connection, init_db
 from fraud_detection import evaluate_single_transaction, evaluate_all_transactions
+from data_generator import generate_users,generate_transactions
 from phishing_detection import score_url
 
 app = Flask(__name__)
+def setup_database():
+    init_db()
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT (*) AS c FROM users")
+    if cur.fetchone()["c"] == 0:
+        users = generate_users(conn,n=30)
+        generate_transactions(conn,users,n=300,fraud_ratio=0.12)
+        evaluate_all_transactions(conn)
+    conn.close()
+setup_database()
 
 
 @app.route("/")
